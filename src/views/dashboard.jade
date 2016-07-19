@@ -1,0 +1,13 @@
+.dashboard
+  .interval-slider
+    span.interval-slider-label= timeInterval
+    span.current-interval 2 sec
+    input(type="range" min="2000" max="20000" step="1000" value="2000")
+
+.row.chart
+  #realtime(data-processed-label=processedLabel data-failed-label=failedLabel)
+  #realtime-legend
+
+.row.chart
+  #history(data-processed-label=processedLabel data-failed-label=failedLabel)
+  #history-legend
