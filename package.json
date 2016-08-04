@@ -1,0 +1,44 @@
+{
+  "name": "el-borracho-graph",
+  "version": "1.0.0",
+  "description": "Sidekiq-inspired graph of realtime and historical statistics from Bull nodejs job queue ",
+  "main": "el-borracho-graph.js",
+  "scripts": {
+    "build": "coffee --bare --map -o lib/ -c src/",
+    "watch": "coffee --watch --bare --map -o lib/ -c src/",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/nextorigin/el-borracho-graph.git"
+  },
+  "keywords": [
+    "bull",
+    "job",
+    "queue",
+    "worker",
+    "stats",
+    "statistics",
+    "graph",
+    "realtime",
+    "history",
+    "historical",
+    "borracho",
+    "sidekiq"
+  ],
+  "author": "doublerebel",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/nextorigin/el-borracho-graph/issues"
+  },
+  "homepage": "https://github.com/nextorigin/el-borracho-graph#readme",
+  "dependencies": {
+    "maquette": "^2.3.3",
+    "rickshaw": "^1.5.1",
+    "spine": "^1.6.2"
+  },
+  "peerDependencies": {},
+  "devDependencies": {
+    "coffee-script": "^1.10.0"
+  }
+}
