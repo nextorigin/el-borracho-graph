@@ -1,12 +1,12 @@
 Rickshaw = require "rickshaw"
-Hover    = require "./hover"
+Hover    = require "./graph-hover"
 
 
 class RealtimeGraph
   makeGraphFrom: (el, series) ->
     new Rickshaw.Graph
       element:        el
-      width:          responsiveWidth()
+      width:          @el.width() - 40 # responsiveWidth()
       height:         200
       renderer:      "line"
       interpolation: "linear"
@@ -15,11 +15,11 @@ class RealtimeGraph
   makeGraph: ->
     [el]    = @el
     labels  = [
+      {name: @completedLabel, color: "#006f68"}
       {name: @failedLabel,    color: "#B1003E"}
-      {name: @processedLabel, color: "#006f68"}
     ]
     options =
-      timeInterval:  timeInterval
+      timeInterval:  @timeInterval
       maxDataPoints: 100
     series  = new Rickshaw.Series.FixedDuration labels, undefined, options
 
@@ -31,25 +31,25 @@ class RealtimeGraph
       tickFormat:     Rickshaw.Fixtures.Number.formatKMBT
       ticksTreatment: "glow"
 
-  constructor: ({@el, @legend, @failedLabel, @processedLabel}) ->
+  constructor: ({@el, @legend, @completedLabel, @failedLabel, @timeInterval}) ->
+    @completedLabel or= "completed"
+    @failedLabel    or= "failed"
+
     @graph = @makeGraph()
     @yaxis = @makeYAxis @graph
     @hover = new Hover {@graph, @legend}
-
-    @failedLabel    or= "failed"
-    @processedLabel or= "processed"
 
   render: (stat) ->
     @graph.series.addData @statToPoint stat if stat
     @graph.render()
 
   reset: ->
-    @graph.empty()
+    @el.empty()
 
   statToPoint: (stat) ->
     point = {}
-    point[@failedLabel] = stat.failed
-    point[@processedLabel] = stat.processed
+    point[@completedLabel] = stat.completed
+    point[@failedLabel]    = stat.failed
     point
 
 

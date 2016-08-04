@@ -10,9 +10,6 @@ debounce = (fn, timeout, timeoutID = -1) -> ->
 class HistoryGraphController extends Spine.Controller
   logPrefix: "(ElBorracho:HistoryGraph)"
 
-  elements:
-    graph:         "#history"
-
   debouncedDefault: debounce @default, 125
 
   updateSliderLabel: (e) ->
@@ -22,7 +19,7 @@ class HistoryGraphController extends Spine.Controller
     "onresize window":                       "debouncedDefault"
 
   constructor: ({baseUrl}) ->
-    @debug "constructing"
+    @log "constructing"
 
     super
 
@@ -42,7 +39,7 @@ class HistoryGraphController extends Spine.Controller
     # @pollOnInterval()
 
   render: =>
-    @debug "rendering"
+    @log "rendering"
     filters = @Store.all()
 
     processed = @Store.findAllByAttribute "type", "processed"
@@ -59,21 +56,12 @@ class HistoryGraphController extends Spine.Controller
 
   pollOnInterval: ->
 
+  error: (args...) =>
+    @trigger "error", args...
+
 
 module.exports = HistoryGraphController
 
-
-
-historyGraph = ->
-
-updateStatsSummary = (data) ->
-  $("ul.summary li.processed span.count").html data.processed.numberWithDelimiter()
-  $("ul.summary li.failed span.count").html data.failed.numberWithDelimiter()
-  $("ul.summary li.busy span.count").html data.busy.numberWithDelimiter()
-  $("ul.summary li.scheduled span.count").html data.scheduled.numberWithDelimiter()
-  $("ul.summary li.retries span.count").html data.retries.numberWithDelimiter()
-  $("ul.summary li.enqueued span.count").html data.enqueued.numberWithDelimiter()
-  $("ul.summary li.dead span.count").html data.dead.numberWithDelimiter()
 
 updateRedisStats = (data) ->
   $(".stat h3.redis_version").html data.redis_version

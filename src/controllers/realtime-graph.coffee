@@ -1,5 +1,4 @@
 Spine    = require "spine"
-Maquette = require "maquette"
 
 
 debounce = (fn, timeout, timeoutID = -1) -> ->
@@ -11,9 +10,9 @@ class RealtimeGraphController extends Spine.Controller
   logPrefix: "(ElBorracho:RealtimeGraph)"
 
   elements:
-    slider:        ".interval-slider input"
-    sliderLabel:   ".current-interval"
-    graph:         "#realtime"
+    "figcaption#realtime-legend":    "legend"
+    ".interval-slider":              "slider"
+    ".current-interval":             "sliderLabel"
 
   debouncedDefault: debounce @default, 125
 
@@ -29,36 +28,41 @@ class RealtimeGraphController extends Spine.Controller
     "change div.interval-slider input":      "updateInterval"
     "mousemove div.interval-slider input":   "updateSliderLabel"
 
-  constructor: ({baseUrl}) ->
-    @debug "constructing"
+  constructor: ({baseUrl, completedLabel, failedLabel}) ->
+    @log "constructing"
 
     super
+    timeInterval = localStorage.timeInterval or= "2000"
 
     @Store      = require "../models/realtime-stat"
     @View       = require "../views/realtime-graph"
+    @view       = new @View {@el, @legend, completedLabel, failedLabel, timeInterval}
 
-    @projector or= Maquette.createProjector()
-    @View        = new @View @el
-
-    @Store.on "error", ->
+    @Store.baseUrl = baseUrl
+    @Store.on "error",  @error
     @Store.on "create", @render
 
-    localStorage.timeInterval or= "2000"
     @default()
-    @pollOnInterval()
 
   default: (fromSlider = false) ->
     {timeInterval} = localStorage
     @slider.val timeInterval unless fromSlider
     @setSliderLabel timeInterval
 
-    clearInterval @_poller if @_poller
+    @Store.stop()
     @reset()
     @render()
+    @Store.listen()
 
   render: (stat) =>
-    @debug "rendering"
-    @view.render point
+    @log "rendering"
+
+    if previous = stat?.previous()
+      processed = stat.processed - previous.processed
+      failed    = stat.failed - previous.failed
+      delta     = {processed, failed}
+
+    @view.render delta
 
   reset: ->
     @view.reset()
@@ -67,32 +71,14 @@ class RealtimeGraphController extends Spine.Controller
     text = "#{Math.round parseFloat(val) / 1000} sec"
     @sliderLabel.text text
 
-  pollOnInterval: ->
-    @_poller = setInterval @Store.fetch, parseInt localStorage.timeInterval
-
-  fetch: ->
-    [el] = @el
-    if i == 0
-      processed = results.processed
-      failed = results.failed
-    else
-      processed = results.processed - (Sidekiq.processed)
-      failed = results.failed - (Sidekiq.failed)
-    dataPoint = {}
-    dataPoint[el.dataset.failedLabel] = failed
-    dataPoint[el.dataset.processedLabel] = processed
-    graph.series.addData dataPoint
-    graph.render()
-    Sidekiq.processed = results.processed
-    Sidekiq.failed = results.failed
-    updateStatsSummary results
-    updateRedisStats data.redis
-    pulseBeacon()
+  error: (args...) =>
+    @trigger "error", args...
 
 
 module.exports = RealtimeGraphController
 
 
+###
 
 historyGraph = ->
   processed = createSeries($("#history").data("processed"))
@@ -199,16 +185,4 @@ Number::numberWithDelimiter = (delimiter) ->
   split[0] = split[0].replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1" + delimiter)
   split.join "."
 
-# Render graphs
-
-
-$ ->
-
-    return
-  return
-# Reset graphs
-
-  return
-
-# Resize graphs after resizing window
-
+###
