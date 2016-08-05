@@ -4,19 +4,23 @@ Spine    = require "spine"
 class RealtimeStat extends Spine.Model
   @configure "RealtimeStat",
     "queue",
-    "processed",
+    "completed",
     "failed"
 
-  @url: "/sse/total"
+  @url: "/stats/sse"
 
   @listen: ->
     @source = new EventSource "#{@baseUrl}#{@url}"
-    @source.addEventListener "message", @createFromEvent
+    # @source.addEventListener "message", @createFromEvent
+    @source.onmessage = @createFromEvent
     @source.addEventListener "error",   @error
 
   @createFromEvent: (e) =>
-    stat   = e.data
-    record = new @RealtimeStat stat
+    try
+      stat = JSON.parse e.data
+    catch e
+      return @error e
+    record = new this stat
     record.save()
     @lru()
 
@@ -30,6 +34,14 @@ class RealtimeStat extends Spine.Model
     return
 
   @error: (args...) => @trigger "error", args...
+
+  save: ->
+    @queue     ?= "all"
+    @completed ?= 0
+    @failed    ?= 0
+    @completed  = parseInt @completed if @completed
+    @failed     = parseInt @failed if @failed
+    super
 
   previous: ->
     {records} = @constructor

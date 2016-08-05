@@ -13,20 +13,20 @@ class GraphHover extends Rickshaw.Graph.HoverDetail
     super
 
   render: ({formattedXValue, detail}) ->
-    timestamp = $ "div.timestamp", {}, [formattedXValue]
+    timestamp = $ "<div>", {class: "timestamp"}, [formattedXValue]
     @legend.empty().append timestamp
     detail.sort (a, b) -> a.order - b.order
     for d in detail
-      yvalue = (Math.floor d.formattedYValue).numberWithDelimiter()
+      yvalue = numberWithDelimiter Math.floor d.formattedYValue
       dot_y  = @graph.y(d.value.y0 + d.value.y)
-      line   = $ "div.line", {}, [
-        ($ "div.swatch", style: backgroundColor: d.series.color)
-        ($ "div.tag", ["#{d.name}:#{yvalue}"])
+      line   = $ "<div>", {class: "line"}, [
+        ($ "<div>", class: "swatch", style: backgroundColor: d.series.color)
+        ($ "<div>", class: "tag", ["#{d.name}:#{yvalue}"])
       ]
-      dot    = $ "div.dot.active", style: top: "#{dot_y}px", borderColor: d.series.color
+      dot    = $ "<div>", class: "dot active", style: top: "#{dot_y}px", borderColor: d.series.color
 
       @legend.append line
-      @element.appendChild dot
+      @element.appendChild dot[0]
       @show()
 
 

@@ -10,7 +10,8 @@ class RealtimeGraphController extends Spine.Controller
   logPrefix: "(ElBorracho:RealtimeGraph)"
 
   elements:
-    "figcaption#realtime-legend":    "legend"
+    # "figcaption#realtime-legend":    "legend"
+    "figcaption.y_axis":             "y_axis"
     ".interval-slider":              "slider"
     ".current-interval":             "sliderLabel"
 
@@ -32,11 +33,13 @@ class RealtimeGraphController extends Spine.Controller
     @log "constructing"
 
     super
-    timeInterval = localStorage.timeInterval or= "2000"
+    timeInterval = localStorage.timeInterval or= 5000
+
+    @legend = $ "figcaption#realtime-legend"
 
     @Store      = require "../models/realtime-stat"
     @View       = require "../views/realtime-graph"
-    @view       = new @View {@el, @legend, completedLabel, failedLabel, timeInterval}
+    @view       = new @View {@el, @legend, @y_axis, completedLabel, failedLabel, timeInterval}
 
     @Store.baseUrl = baseUrl
     @Store.on "error",  @error
@@ -50,7 +53,7 @@ class RealtimeGraphController extends Spine.Controller
     @setSliderLabel timeInterval
 
     @Store.stop()
-    @reset()
+    # @reset()
     @render()
     @Store.listen()
 
@@ -58,9 +61,9 @@ class RealtimeGraphController extends Spine.Controller
     @log "rendering"
 
     if previous = stat?.previous()
-      processed = stat.processed - previous.processed
+      completed = stat.completed - previous.completed
       failed    = stat.failed - previous.failed
-      delta     = {processed, failed}
+      delta     = {completed, failed}
 
     @view.render delta
 
