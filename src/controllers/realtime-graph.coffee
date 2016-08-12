@@ -1,21 +1,12 @@
 Spine    = require "spine"
 
 
-debounce = (fn, timeout, timeoutID = -1) -> ->
-  if timeoutID > -1 then window.clearTimeout timeoutID
-  timeoutID = window.setTimeout fn, timeout
-
-
 class RealtimeGraphController extends Spine.Controller
   logPrefix: "(ElBorracho:RealtimeGraph)"
 
   elements:
-    # "figcaption#realtime-legend":    "legend"
-    "figcaption.y_axis":             "y_axis"
     ".interval-slider":              "slider"
     ".current-interval":             "sliderLabel"
-
-  debouncedDefault: debounce @default, 125
 
   updateInterval: (e) ->
     localStorage.timeInterval = ($ e.target).val()
@@ -24,10 +15,20 @@ class RealtimeGraphController extends Spine.Controller
   updateSliderLabel: (e) ->
     @setSliderLabel ($ e.target).val()
 
+  keepLegend: ->
+    clearTimeout @_legendTimeout if @_legendTimeout
+
+  timeoutLegend: ->
+    @_legendTimeout = setTimeout @clearLegend, 5000
+
+  clearLegend: =>
+    @legend.fadeOut 300, => @legend.empty().show 1
+
   events:
-    "onresize window":                       "debouncedDefault"
     "change div.interval-slider input":      "updateInterval"
     "mousemove div.interval-slider input":   "updateSliderLabel"
+    "mouseover":                             "keepLegend"
+    "mouseout":                              "timeoutLegend"
 
   constructor: ({baseUrl, completedLabel, failedLabel}) ->
     @log "constructing"
@@ -39,7 +40,7 @@ class RealtimeGraphController extends Spine.Controller
 
     @Store      = require "../models/realtime-stat"
     @View       = require "../views/realtime-graph"
-    @view       = new @View {@el, @legend, @y_axis, completedLabel, failedLabel, timeInterval}
+    @view       = new @View {@el, @legend, completedLabel, failedLabel, timeInterval}
 
     @Store.baseUrl = baseUrl
     @Store.on "error",  @error
@@ -52,8 +53,7 @@ class RealtimeGraphController extends Spine.Controller
     # @slider.val timeInterval unless fromSlider
     # @setSliderLabel timeInterval
 
-    @stop()
-    # @reset()
+    @reset()
     @render()
 
   render: (stat) =>

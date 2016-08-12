@@ -35,7 +35,8 @@
   "dependencies": {
     "maquette": "^2.3.3",
     "rickshaw": "^1.5.1",
-    "spine": "^1.6.2"
+    "spine": "^1.6.2",
+    "spine-awaitajax": "^1.0.2"
   },
   "peerDependencies": {},
   "devDependencies": {

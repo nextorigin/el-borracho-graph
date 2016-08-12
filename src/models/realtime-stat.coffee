@@ -13,7 +13,6 @@ class RealtimeStat extends Spine.Model
     return if @source
     @source = new EventSource "#{@baseUrl}#{@url}"
     @source.addEventListener "total", @createFromEvent
-    @source.addEventListener "history", (data) -> console.log "oops got history"
     @source.addEventListener "error",   @error
 
   @createFromEvent: (e) =>
@@ -28,7 +27,6 @@ class RealtimeStat extends Spine.Model
   @stop: =>
     return unless @source
     @source.removeEventListener "total", @createFromEvent
-    # @source.removeEventListener "message", @createFromEvent
     @source.removeEventListener "error",   @error
     @source.close()
     delete @source

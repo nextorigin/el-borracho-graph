@@ -1,51 +1,47 @@
 Spine    = require "spine"
 Maquette = require "maquette"
-
-
-debounce = (fn, timeout, timeoutID = -1) -> ->
-  if timeoutID > -1 then window.clearTimeout timeoutID
-  timeoutID = window.setTimeout fn, timeout
+Graph    = require "./realtime-graph"
 
 
 class HistoryGraphController extends Spine.Controller
   logPrefix: "(ElBorracho:HistoryGraph)"
 
-  debouncedDefault: debounce @default, 125
+  keepLegend: ->
+    clearTimeout @_legendTimeout if @_legendTimeout
 
-  updateSliderLabel: (e) ->
-    @setSliderLabel ($ e.target).val()
+  timeoutLegend: ->
+    @_legendTimeout = setTimeout @clearLegend, 3000
+
+  clearLegend: =>
+    @legend.fadeOut 300, => @legend.empty().show 1
 
   events:
-    "onresize window":                       "debouncedDefault"
+    "mouseover":                             "keepLegend"
+    "mouseout":                              "timeoutLegend"
 
-  constructor: ({baseUrl}) ->
+  constructor: ({baseUrl, completedLabel, failedLabel}) ->
     @log "constructing"
 
     super
 
-    @Store      = require "../models/history-stats"
-    @view       = require "../views/history-graph"
-    @filterView = require "../views/filter"
+    @legend = $ "figcaption#history-legend"
 
-    # @projector or= Maquette.createProjector()
-    # @filterMap   = new Mapper [], @filterView
+    @Store      = require "../models/history-stat"
+    @View       = require "../views/history-graph"
+    @view       = new @View {@el, @legend, completedLabel, failedLabel}
 
-    @Store.on "error", ->
-    @Store.on "change", @render
-    # @projector.append @el[0], @render
+    @Store.baseUrl = baseUrl
+    @Store.on "error",  @error
+    @Store.on "refresh", @render
 
-    # localStorage.timeInterval or= "2000"
     @default()
-    # @pollOnInterval()
 
   render: =>
     @log "rendering"
-    filters = @Store.all()
-
-    processed = @Store.findAllByAttribute "type", "processed"
+    completed = @Store.findAllByAttribute "type", "completed"
     failed    = @Store.findAllByAttribute "type", "failed"
 
-    @view.render {processed, failed}
+    @view.render {completed, failed}
 
   default: ->
     @reset()
@@ -54,8 +50,6 @@ class HistoryGraphController extends Spine.Controller
   reset: ->
     @view.reset()
 
-  pollOnInterval: ->
-
   error: (args...) =>
     @trigger "error", args...
 
@@ -63,15 +57,9 @@ class HistoryGraphController extends Spine.Controller
 module.exports = HistoryGraphController
 
 
-updateRedisStats = (data) ->
-  $(".stat h3.redis_version").html data.redis_version
-  $(".stat h3.uptime_in_days").html data.uptime_in_days
-  $(".stat h3.connected_clients").html data.connected_clients
-  $(".stat h3.used_memory_human").html data.used_memory_human
-  $(".stat h3.used_memory_peak_human").html data.used_memory_peak_human
-
-pulseBeacon = ->
-  $(".beacon").addClass("pulse").delay(1000).queue ->
-    $(this).removeClass("pulse").dequeue()
-
-
+# updateRedisStats = (data) ->
+#   $(".stat h3.redis_version").html data.redis_version
+#   $(".stat h3.uptime_in_days").html data.uptime_in_days
+#   $(".stat h3.connected_clients").html data.connected_clients
+#   $(".stat h3.used_memory_human").html data.used_memory_human
+#   $(".stat h3.used_memory_peak_human").html data.used_memory_peak_human

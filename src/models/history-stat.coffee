@@ -1,4 +1,5 @@
 Spine    = require "spine"
+__       = require "spine-awaitajax"
 
 
 class HistoryStat extends Spine.Model
@@ -6,14 +7,14 @@ class HistoryStat extends Spine.Model
     "queue",
     "date",
     "type",
-    "value"
+    "value",
+    "count"
 
-  # @extend Spine.Model.Ajax
-  @url: "/history"
+  @extend Spine.Model.Ajax
+  @url: -> "#{@baseUrl}/history"
 
-  date: (date) ->
-    @id = date if date
-    @id
+  value: (value) ->
+    @count = Number value or 0
 
 
-module.exports = HistoryStats
+module.exports = HistoryStat
