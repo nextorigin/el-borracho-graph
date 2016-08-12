@@ -10,9 +10,10 @@ class RealtimeStat extends Spine.Model
   @url: "/stats/sse"
 
   @listen: ->
+    return if @source
     @source = new EventSource "#{@baseUrl}#{@url}"
-    # @source.addEventListener "message", @createFromEvent
-    @source.onmessage = @createFromEvent
+    @source.addEventListener "total", @createFromEvent
+    @source.addEventListener "history", (data) -> console.log "oops got history"
     @source.addEventListener "error",   @error
 
   @createFromEvent: (e) =>
@@ -26,8 +27,11 @@ class RealtimeStat extends Spine.Model
 
   @stop: =>
     return unless @source
-    @source.removeEventListener "message", @createFromEvent
+    @source.removeEventListener "total", @createFromEvent
+    # @source.removeEventListener "message", @createFromEvent
     @source.removeEventListener "error",   @error
+    @source.close()
+    delete @source
 
   @lru: ->
     record.destroy() for record in @records[0..100] if @count() > 10000

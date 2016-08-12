@@ -33,7 +33,7 @@ class RealtimeGraphController extends Spine.Controller
     @log "constructing"
 
     super
-    timeInterval = localStorage.timeInterval or= 5000
+    timeInterval = localStorage.timeInterval or= 2000
 
     @legend = $ "figcaption#realtime-legend"
 
@@ -47,15 +47,14 @@ class RealtimeGraphController extends Spine.Controller
 
     @default()
 
-  default: (fromSlider = false) ->
+  default: (fromSlider = false) =>
     {timeInterval} = localStorage
-    @slider.val timeInterval unless fromSlider
-    @setSliderLabel timeInterval
+    # @slider.val timeInterval unless fromSlider
+    # @setSliderLabel timeInterval
 
-    @Store.stop()
+    @stop()
     # @reset()
     @render()
-    @Store.listen()
 
   render: (stat) =>
     @log "rendering"
@@ -69,6 +68,12 @@ class RealtimeGraphController extends Spine.Controller
 
   reset: ->
     @view.reset()
+
+  start: =>
+    @Store.listen()
+
+  stop: =>
+    @Store.stop()
 
   setSliderLabel: (val) ->
     text = "#{Math.round parseFloat(val) / 1000} sec"
