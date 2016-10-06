@@ -17,12 +17,10 @@ class RealtimeStat extends Spine.Model
 
   @createFromEvent: (e) =>
     try
-      stat = JSON.parse e.data
+      stat = @refresh e.data
+      @lru()
     catch e
       return @error e
-    record = new this stat
-    record.save()
-    @lru()
 
   @stop: =>
     return unless @source
