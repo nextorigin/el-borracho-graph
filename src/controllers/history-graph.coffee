@@ -55,11 +55,3 @@ class HistoryGraphController extends Spine.Controller
 
 
 module.exports = HistoryGraphController
-
-
-# updateRedisStats = (data) ->
-#   $(".stat h3.redis_version").html data.redis_version
-#   $(".stat h3.uptime_in_days").html data.uptime_in_days
-#   $(".stat h3.connected_clients").html data.connected_clients
-#   $(".stat h3.used_memory_human").html data.used_memory_human
-#   $(".stat h3.used_memory_peak_human").html data.used_memory_peak_human
