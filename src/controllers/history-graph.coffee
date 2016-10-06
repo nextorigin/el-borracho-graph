@@ -1,5 +1,4 @@
 Spine    = require "spine"
-Maquette = require "maquette"
 Graph    = require "./realtime-graph"
 
 
