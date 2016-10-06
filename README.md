@@ -10,6 +10,14 @@ Designed for use with [el-borracho][el-borracho] and [el-borracho-stats][el-borr
 
 [![NPM][npm-stats]][npm]
 
+## Installation
+```sh
+npm install --save el-borracho-graph
+```
+
+## License
+
+MIT
 
   [el-borracho]: https://github.com/nextorigin/el-borracho
   [el-borracho-stats]: https://github.com/nextorigin/el-borracho-stats
