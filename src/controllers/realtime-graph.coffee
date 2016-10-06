@@ -50,8 +50,9 @@ class RealtimeGraphController extends Spine.Controller
 
   default: (fromSlider = false) =>
     {timeInterval} = localStorage
-    # @slider.val timeInterval unless fromSlider
-    # @setSliderLabel timeInterval
+    if @slider?.length and not fromSlider
+      @slider.val timeInterval unless fromSlider
+      @setSliderLabel timeInterval
 
     @reset()
     @render()
