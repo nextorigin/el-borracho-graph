@@ -44,7 +44,7 @@ class RealtimeGraphController extends Spine.Controller
 
     @Store.baseUrl = baseUrl
     @Store.on "error",  @error
-    @Store.on "create", @render
+    @Store.on "create refresh", @render
 
     @default()
 
@@ -57,15 +57,14 @@ class RealtimeGraphController extends Spine.Controller
     @reset()
     @render()
 
-  render: (stat) =>
+  render: (stats) =>
     @log "rendering"
-
-    if previous = stat?.previous()
+    stats = [stats] unless Array.isArray stats
+    for stat in stats when previous = stat?.previous()
       completed = stat.completed - previous.completed
       failed    = stat.failed - previous.failed
       delta     = {completed, failed}
-
-    @view.render delta
+      @view.render delta
 
   reset: ->
     @view.reset()
