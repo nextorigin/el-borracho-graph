@@ -1,6 +1,6 @@
 {
   "name": "el-borracho-graph",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "Sidekiq-inspired graph of realtime and historical statistics from Bull nodejs job queue",
   "main": "el-borracho-graph.js",
   "scripts": {
