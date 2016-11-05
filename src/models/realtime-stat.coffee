@@ -12,20 +12,20 @@ class RealtimeStat extends Spine.Model
   @listen: ->
     return if @source
     @source = new EventSource "#{@baseUrl}#{@url}"
-    @source.addEventListener "total", @createFromEvent
-    @source.addEventListener "error", @error
+    @source.addEventListener "total", @_createFromEvent = @proxy @createFromEvent
+    @source.addEventListener "error", @_error = @proxy @error
 
-  @createFromEvent: (e) =>
+  @createFromEvent: (e) ->
     try
       stat = @refresh e.data
       @lru()
     catch e
       return @error e
 
-  @stop: =>
+  @stop: ->
     return unless @source
-    @source.removeEventListener "total", @createFromEvent
-    @source.removeEventListener "error", @error
+    @source.removeEventListener "total", @_createFromEvent
+    @source.removeEventListener "error", @_error
     @source.close()
     delete @source
 
@@ -33,7 +33,7 @@ class RealtimeStat extends Spine.Model
     record.destroy() for record in @records[0..100] if @count() > 10000
     return
 
-  @error: (args...) => @trigger "error", args...
+  @error: (args...) -> @trigger "error", args...
 
   save: ->
     @queue     ?= "all"

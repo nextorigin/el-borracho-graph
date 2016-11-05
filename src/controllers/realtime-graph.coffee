@@ -33,14 +33,14 @@ class RealtimeGraphController extends Spine.Controller
   constructor: ({baseUrl, completedLabel, failedLabel}) ->
     @log "constructing"
 
+    @Store       = require "../models/realtime-stat"
+    @View        = require "../views/realtime-graph"
+    @legend      = $ "figcaption#realtime-legend"
+
     super
+
     timeInterval = localStorage.timeInterval or= 2000
-
-    @legend = $ "figcaption#realtime-legend"
-
-    @Store      = require "../models/realtime-stat"
-    @View       = require "../views/realtime-graph"
-    @view       = new @View {@el, @legend, completedLabel, failedLabel, timeInterval}
+    @view        = new @View {@el, @legend, completedLabel, failedLabel, timeInterval}
 
     @Store.baseUrl = baseUrl
     @Store.on "error",  @error

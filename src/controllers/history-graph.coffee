@@ -21,12 +21,12 @@ class HistoryGraphController extends Spine.Controller
   constructor: ({baseUrl, completedLabel, failedLabel}) ->
     @log "constructing"
 
-    super
-
-    @legend = $ "figcaption#history-legend"
-
     @Store      = require "../models/history-stat"
     @View       = require "../views/history-graph"
+    @legend     = $ "figcaption#history-legend"
+
+    super
+
     @view       = new @View {@el, @legend, completedLabel, failedLabel}
 
     @Store.baseUrl = baseUrl
