@@ -33,7 +33,7 @@
   },
   "homepage": "https://github.com/nextorigin/el-borracho-graph#readme",
   "dependencies": {
-    "rickshaw": "^1.5.1",
+    "rickshaw": "^1.6.0",
     "spine": "^1.6.2",
     "spine-awaitajax": "^2.0.0"
   },
