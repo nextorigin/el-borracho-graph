@@ -1,5 +1,7 @@
 # el-borracho-graph
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/nextorigin/el-borracho-graph.svg)](https://greenkeeper.io/)
+
 [![Dependency Status][dependency]][david]
 [![devDependency Status][dev-dependency]][david-dev]
 [![Downloads][downloads]][npm]
